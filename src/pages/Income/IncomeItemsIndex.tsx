@@ -1,0 +1,244 @@
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import TableComp, { TableColumnType, ActionButtonType } from "../../components/tables/TableComp";
+import { FileIcon, PlusIcon, TableActionButtonDeleteIcon } from "../../icons/index.ts";
+import ApiRequest, { ApiResponse } from "../../classes/ApiRequest.ts";
+import { Modal } from '../../components/ui/modal';
+import { useState, useEffect, useRef } from 'react';
+import Button from "../../components/ui/button/Button.tsx";
+import Input from '../../components/form/input/InputField';
+import Label from '../../components/form/Label.tsx';
+import ToastrNotification from "../../classes/ToastrNotification.ts";
+import Select from '../../components/form/Select.tsx';
+import TextArea from "../../components/form/input/TextArea.tsx";
+import PageMeta from '../../components/common/PageMeta';
+import { Permission } from "../../classes/Permission.ts";
+import { Navigate } from "react-router-dom";
+import { ROUTES } from "../../routes.ts";
+
+interface IncomeItemStoreFormData {
+  income_id: number | null;
+  amount: string;
+  description: string;
+}
+
+
+export default function IncomeItemsIndex() {
+  if (Permission.check(['super_admin']) === false) return <Navigate to={ROUTES.home} replace />;
+  
+  const tableReloader = useRef<(() => void) | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [incomes, setIncomes] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<IncomeItemStoreFormData>({
+    income_id: null,
+    amount: '',
+    description: '',
+  });
+
+  useEffect(() => {
+    ApiRequest.call('api/admin/income-items/create', 'get',null,null,false,true).then((response) => {
+      setIncomes(response.data.incomes);
+    })
+  }, []);
+
+
+
+  const handleInputChange = (field: keyof IncomeItemStoreFormData) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const actionButtons: ActionButtonType[] = [
+    {
+      name: "delete",
+      label: "حذف",
+      icon: <TableActionButtonDeleteIcon />,
+      className: "hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90",
+      onClick: (item) => {
+        ApiRequest.call('api/admin/income-items/' + item.id, 'DELETE',null,null,true,true).then((response) => {
+          if (response.success) {
+            tableReloader.current?.();
+          }
+        });
+      }
+    }
+  ];
+
+  const columns: TableColumnType[] = [
+    {name: "id", label: "شناسه", type: "number", notNumberFormat: true },
+    {name: "income.title", label: "عنوان", type: "text", textLimit: 30, notSortable: true},
+    {name: "amount", label: "مبلغ", type: "number" },
+    {name: "description", label: "توضیحات", type: "text", textLimit: 60, notSortable: true},
+  ];
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // ساخت requestData بدون other_reduces_amount
+      const requestData = {
+        income_id: formData.income_id,
+        amount: formData.amount,
+        description: formData.description,
+      };
+
+      let response: ApiResponse;
+      response = await ApiRequest.call(
+        'api/admin/income-items',
+        'POST',
+        requestData,
+        null,
+        true,
+        true
+      );
+
+      if (response.success) {
+        tableReloader.current?.();
+      }
+    } catch (error) {
+      ToastrNotification.error('خطا در هنگام ثبت');
+    } finally {
+      setIsSubmitting(false);
+      setIsCreateModalOpen(false);
+    }
+  };
+
+  const getExcelExport = () => {
+    ApiRequest.call(`api/admin/income-items`, 'GET', null, null, false, true, false, 'xlsx').then((response:ApiResponse) => {
+      const a = document.createElement('a');
+      a.href = response.data.url;
+      a.download = response.data.filename;
+      a.click();
+      window.URL.revokeObjectURL(response.data.url);
+    });
+  }
+
+  return (
+    <>
+      <PageMeta title="لیست درآمد ها" />
+      <Button className="mb-3" variant="success" size="sm" startIcon={<PlusIcon />} onClick={() => setIsCreateModalOpen(true)}>
+        ثبت درآمد
+      </Button>
+      <Button className="mb-3 bg-yellow-200 mr-3" variant="outline" size="sm" startIcon={<FileIcon />} onClick={getExcelExport}>
+        خروجی اکسل
+      </Button>
+      
+      <PageBreadcrumb pageTitle="درآمد ها" />
+      <div className="space-y-6">
+        <TableComp
+          apiRequestUrl="api/admin/income-items"
+          dataPathInApiRequest="data.items.data"
+          columns={columns}
+          actionButtons={actionButtons}
+          wantPagination={true}
+          paginationPathInApiRequest="data.items"
+          pageTitle="درآمد ها"
+          tableReloader={(fn) => (tableReloader.current = fn)}
+        />
+        <Modal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+          }}
+          className="m-4 max-w-[500px]"
+          showCloseButton={false}
+        >
+          <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-4 lg:p-8 dark:bg-gray-900">
+        <div className="px-2">
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            {'ایجاد درآمد جدید'}
+          </h4>
+          <p className="mb-2 text-sm text-gray-500 lg:mb-2 dark:text-gray-400">
+            {'اطلاعات درآمد جدید را وارد کنید.'}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="custom-scrollbar overflow-y-auto px-2">
+            <div className="space-y-3">
+              {/* مبلغ وام */}
+              <div>
+                <Label htmlFor="amount">مبلغ</Label>
+                <Input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  placeholder="مبلغ درآمد ورودی را وارد کنید"
+                  value={formData.amount}
+                  onChange={handleInputChange('amount')}
+                  min="0"
+                  step={1000}
+                  numberFormat={true}
+                />
+              </div>
+              <div>
+                <Label htmlFor="title">عنوان درآمد</Label>
+                <Select
+                  options={incomes?.map((income:any) => ({
+                    value: income.id.toString() || '',
+                    label: income.title
+                  })) || []}
+                  placeholder="یک درآمد را انتخاب کنید"
+                  onChange={(value) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      income_id: parseInt(value)
+                    }));
+                  }}
+                  className="dark:bg-dark-900"
+                />
+              </div>
+              <div>
+              <Label htmlFor="description">توضیحات</Label>
+              <TextArea
+                value={formData.description}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: value
+                  }));
+                }}
+                placeholder="توضیحات را وارد کنید"
+                rows={4}
+              />
+            </div>
+            </div>
+          </div>
+
+          {/* دکمه‌های عملیات */}
+          <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={()=> setIsCreateModalOpen(false)}
+              disabled={isSubmitting}
+              type="button"
+            >
+              انصراف
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              type="submit"
+            >
+              {isSubmitting
+                ? 'در حال ذخیره...'
+                :  'ذخیره'}
+            </Button>
+          </div>
+        </form>
+      </div>
+        </Modal>
+      </div>
+
+    
+    </>
+  );
+}
