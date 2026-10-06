@@ -26,10 +26,7 @@ export default function Login() {
                   <img width={330} height={48} src="/images/logo/se-logo.png" alt="Logo" />
                 </Link>
                 <p className="text-center text-gray-400 dark:text-white/60">
-                  نرم افزار مدیریت وام های صندوق تعاون
-                </p>
-                <p className="text-center text-gray-400 dark:text-white/60">
-                  شهرستان بندرگز
+                  پنل ادمین اتاق آبی
                 </p>
               </div>
             </div>

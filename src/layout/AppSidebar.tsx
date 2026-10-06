@@ -9,14 +9,17 @@ import {
   HorizontaLDots,
   PlugInIcon,
   UserCircleIcon,
-  //DocsIcon,
+  DocsIcon,
   BoxIcon,
   UserIcon,
+  GroupIcon,
+  ChatIcon,
   BoxCubeIcon,
-  DollarLineIcon,
-  PieChartIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
+  FolderIcon,
+  ListIcon,
+  PageIcon,
+  TaskIcon,
+  BoltIcon,
 } from '../icons';
 import { useSidebar } from '../context/SidebarContext';
 import { ROUTES } from '../routes';
@@ -39,23 +42,6 @@ const navItems: NavItem[] = [
     path: ROUTES.home,
     requiredPermissions: ['any']
   },
-  {
-    icon: <BoxCubeIcon />,
-    name: 'خزانه ها',
-    path: ROUTES.vaultsIndex,
-    requiredPermissions: ['super_admin']
-  },
-  // user ========================================================================================================
-  {
-    icon: <DollarLineIcon />,
-    name: 'تسهیلات',
-    subItems: [
-      { name: 'درخواست های من', icon: <UserCircleIcon />, path: ROUTES.userRequestedLoans, requiredPermissions: ['user'] },
-      { name: 'وام های من', icon: <UserCircleIcon />, path: ROUTES.userLoans, requiredPermissions: ['user'] },
-      { name: 'اقساط', icon: <UserCircleIcon />, path: ROUTES.userInstallments, requiredPermissions: ['user'] }
-    ],
-    requiredPermissions: ['user']
-  },
   // admin ========================================================================================================
   {
     icon: <BoxCubeIcon />,
@@ -64,52 +50,60 @@ const navItems: NavItem[] = [
     requiredPermissions: ['super_admin']
   },
   {
+    icon: <GroupIcon />,
+    name: 'اساتید',
+    path: ROUTES.teacherIndex,
+    requiredPermissions: ['super_admin']
+  },
+  {
+    icon: <ChatIcon />,
+    name: 'نظرات هنرجویان',
+    path: ROUTES.studentCommentIndex,
+    requiredPermissions: ['super_admin']
+  },
+  {
+    icon: <DocsIcon />,
+    name: 'آموزش',
+    subItems: [
+      { name: 'دسته‌بندی‌ها', icon: <FolderIcon />, path: ROUTES.categoryIndex, requiredPermissions: ['super_admin'] },
+      { name: 'دوره‌ها', icon: <DocsIcon />, path: ROUTES.courseIndex, requiredPermissions: ['super_admin'] },
+      { name: 'پلن‌ها', icon: <TaskIcon />, path: ROUTES.planIndex, requiredPermissions: ['super_admin'] }
+    ],
+    requiredPermissions: ['super_admin']
+  },
+  {
+    icon: <PageIcon />,
+    name: 'محتوای سایت',
+    subItems: [
+      { name: 'اسلایدرها', icon: <PageIcon />, path: ROUTES.sliderIndex, requiredPermissions: ['super_admin'] },
+      { name: 'سکشن‌های صفحه اصلی', icon: <ListIcon />, path: ROUTES.sectionIndex, requiredPermissions: ['super_admin'] }
+    ],
+    requiredPermissions: ['super_admin']
+  },
+  {
+    icon: <BoltIcon />,
+    name: 'درگاه‌های پرداخت',
+    path: ROUTES.gatewayIndex,
+    requiredPermissions: ['super_admin']
+  },
+  {
+    icon: <BoxIcon />,
+    name: 'مناطق',
+    subItems: [
+      { name: 'استان‌ها', icon: <BoxIcon />, path: ROUTES.provinceIndex, requiredPermissions: ['super_admin'] },
+      { name: 'شهرها', icon: <BoxIcon />, path: ROUTES.cityIndex, requiredPermissions: ['super_admin'] }
+    ],
+    requiredPermissions: ['super_admin']
+  },
+  {
     icon: <UserIcon />,
     name: 'کاربران',
     subItems: [
       { name: 'لیست کاربران', icon: <UserCircleIcon />, path: ROUTES.userIndex, requiredPermissions: ['super_admin',  'accounting'] },
-      { name: 'تسویه حساب', icon: <UserCircleIcon />, path: ROUTES.checkoutIndex, requiredPermissions: ['super_admin'] }
+      // { name: 'تسویه حساب', icon: <UserCircleIcon />, path: ROUTES.checkoutIndex, requiredPermissions: ['super_admin'] }
     ],
     requiredPermissions: ['super_admin', 'accounting']
   },
-  {
-    icon: <DollarLineIcon />,
-    name: 'تسهیلات',
-    subItems: [
-      { name: 'رزرو تسهیلات', icon: <UserCircleIcon />, path: ROUTES.reservedLoansIndex, requiredPermissions: ['super_admin'] },
-      { name: 'وام های تجمیعی', icon: <UserCircleIcon />, path: ROUTES.paymentLoansIndex, requiredPermissions: ['super_admin'] },
-      { name: 'لیست وام ها', icon: <UserCircleIcon />, path: ROUTES.loansIndex, requiredPermissions: ['super_admin'] },
-      { name: 'اقساط', icon: <UserCircleIcon />, path: ROUTES.installmentsIndex, requiredPermissions: ['super_admin'] }
-    ],
-    requiredPermissions: ['super_admin']
-  },
-  {
-    icon: <PieChartIcon />,
-    name: 'حسابداری',
-    subItems: [
-      { name: 'ورودی ها', icon: <UserCircleIcon />, path: ROUTES.accountingActionsIndex, requiredPermissions: ['super_admin', 'accounting'] },
-      { name: 'مغایرت‌ها', icon: <UserCircleIcon />, path: ROUTES.contradictionsIndex, requiredPermissions: ['super_admin', 'accounting'] },
-    ],
-    requiredPermissions: ['super_admin', 'accounting']
-  },
-  {
-    icon: <ArrowDownIcon/>,
-    name: 'درآمدها',
-    subItems: [
-      { name: 'تعریف درآمد', icon: <UserCircleIcon />, path: ROUTES.incomeIndex, requiredPermissions: ['super_admin'] },
-      { name: 'درآمد ها', icon: <UserCircleIcon />, path: ROUTES.incomeItemsIndex, requiredPermissions: ['super_admin'] },
-    ],
-    requiredPermissions: ['super_admin']
-  },
-  {
-    icon: <ArrowUpIcon/>,
-    name: 'هزینه ها',
-    subItems: [
-      { name: 'تعریف هزینه', icon: <UserCircleIcon />, path: ROUTES.expenseIndex, requiredPermissions: ['super_admin'] },
-      { name: 'هزینه ها', icon: <UserCircleIcon />, path: ROUTES.expenseItemsIndex, requiredPermissions: ['super_admin'] },
-    ],
-    requiredPermissions: ['super_admin']
-  }
 ];
 
 // برچسب فارسی برای کلیدهای تنظیمات

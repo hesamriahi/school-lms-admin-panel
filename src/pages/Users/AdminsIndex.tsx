@@ -6,14 +6,12 @@ import { PlusIcon } from "../../icons/index.ts";
 import {FilterItemType} from "../../components/tables/TableFilterComp.tsx";
 import { useState, useRef } from 'react';
 import ApiRequest, { ApiResponse } from "../../classes/ApiRequest.ts";
-import Switch from '../../components/form/switch/Switch';
 import PageMeta from '../../components/common/PageMeta';
 
 import { Modal } from '../../components/ui/modal';
 import Button from '../../components/ui/button/Button';
 import Input from '../../components/form/input/InputField';
 import Label from '../../components/form/Label';
-import Select from '../../components/form/Select.tsx';
 
 import { Permission } from "../../classes/Permission.ts";
 import { Navigate } from "react-router-dom";
@@ -23,8 +21,6 @@ interface AdminStoreFormData {
   username: string;
   mobile: string;
   password: string;
-  is_active: boolean | null;
-  role: string
 }
 
     // todo: IMAGE COLUMN
@@ -35,18 +31,6 @@ export default function AdminsIndex() {
     {name: "name", label: "نام و نام خانوادگی", type: "text", textLimit: 30},
     {name: "username", label: "نام کاربری", type: "text", textLimit: 30},
     {name: "mobile", label: "شماره همراه", type: "mobile", textLimit: 30, notSortable: true},
-    {name: "role", label: "نقش", type: "enum",
-      enumValues: [
-        {key: 'super_admin', color:'noColor', label:'مدیر'},
-        {key: 'accounting', color:'noColor', label:'حسابدار'},
-      ]
-    },
-    {name: "is_active", label: "وضعیت", type: "enum",
-      enumValues: [
-        {key: 1, color:'success', label:'فعال'},
-        {key: 0, color:'error', label:'غیر فعال'},
-      ]
-    },
     {name: "created_at", label: "تاریخ ثبت", type: "datetime"},
   ];
 
@@ -61,8 +45,6 @@ export default function AdminsIndex() {
     username: '',
     mobile: '',
     password: '',
-    role: '',
-    is_active: null
   });
 
   const actionButtons:ActionButtonType[] = [
@@ -96,16 +78,6 @@ export default function AdminsIndex() {
       type: "text",
       columnSize: 1,
     },
-    {
-      name:"role",
-      label: "نقش",
-      type: "selectBox",
-      options: [
-        {value: 'super_admin', label:'مدیر'},
-        {value: 'accounting', label:'حسابدار'},
-      ],
-      columnSize: 1,
-    }
   ];
 
 
@@ -128,8 +100,6 @@ export default function AdminsIndex() {
         name: formData.name,
         username: formData.username,
         mobile: formData.mobile,
-        is_active: formData.is_active,
-        role: formData.role,
         ...(formData.password && { password: formData.password })
       };
 
@@ -160,9 +130,7 @@ export default function AdminsIndex() {
         name: item.name,
         username: item.username,
         mobile: item.mobile,
-        role: item.role,
         password: '',
-        is_active: item.is_active ? true : false
       });
       setIsUpdateMode(true);
       setSelectedAdminId(item.id);
@@ -171,9 +139,7 @@ export default function AdminsIndex() {
         name: '',
         username: '',
         mobile: '',
-        role: '',
         password: '',
-        is_active: true
       });
       setIsUpdateMode(false);
     }
@@ -187,9 +153,7 @@ export default function AdminsIndex() {
       name: '',
       username: '',
       mobile: '',
-      role: '',
       password: '',
-      is_active: true
     });
     setSelectedAdminId(null);
   }
@@ -284,39 +248,7 @@ export default function AdminsIndex() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="title">نقش</Label>
-                <Select
-                  options={[
-                    {label: 'مدیر', value: 'super_admin'},
-                    {label: 'حسابدار', value: 'accounting'}
-                  ]}
-                  placeholder="یک نقش را انتخاب کنید"
-                  defaultValue={formData.role}
-                  onChange={(value) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      role: value
-                    }));
-                  }}
-                  className="dark:bg-dark-900"
-                />
-              </div>
-
-              <div>
-                {formData.is_active !== null && 
-                  <Switch
-                    key={`is_active`}
-                    label="فعال/غیرفعال"
-                    defaultChecked={formData.is_active}
-                    onChange={(checked) => setFormData((prev) => ({
-                      ...prev,
-                      is_active: checked,
-                    }))}
-                  />
-                }
-                
-              </div>
+              
             </div>
           </div>
 

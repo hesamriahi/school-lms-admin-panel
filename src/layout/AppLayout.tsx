@@ -9,7 +9,6 @@ import {useDispatch} from "react-redux";
 import { useEffect } from 'react';
 import PageMeta from "../components/common/PageMeta.tsx";
 import Settings from '../classes/Settings.ts';
-import { Permission } from '../classes/Permission.ts';
 
 
 
@@ -23,9 +22,10 @@ const LayoutContent: React.FC = () => {
   }
 
   useEffect(() => {
-    if (Permission.check(['user']))
-      Settings.callUserHomeApi(dispatch);
-    else Settings.callHomeApi(dispatch);
+    Settings.callHomeApi(dispatch);
+    // if (Permission.check(['user']))
+    //   Settings.callUserHomeApi(dispatch);
+    // else Settings.callHomeApi(dispatch);
   }, [dispatch]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

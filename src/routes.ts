@@ -12,6 +12,48 @@ export const ROUTES = {
     images: '/images',
     videos: '/videos',
     error404: '*',
+    // teachers
+    teacherIndex: '/teachers',
+    teacherCreate: '/teachers/create',
+    teacherEdit: '/teachers/:id/edit',
+    // student comments
+    studentCommentIndex: '/student-comments',
+    studentCommentCreate: '/student-comments/create',
+    studentCommentEdit: '/student-comments/:id/edit',
+    // categories
+    categoryIndex: '/categories',
+    categoryCreate: '/categories/create',
+    categoryEdit: '/categories/:id/edit',
+    // courses + units
+    courseIndex: '/courses',
+    courseCreate: '/courses/create',
+    courseEdit: '/courses/:id/edit',
+    courseUnitsIndex: '/courses/:id/units',
+    courseUnitCreate: '/courses/:id/units/create',
+    courseUnitEdit: '/courses/:id/units/:unitId/edit',
+    // plans
+    planIndex: '/plans',
+    planCreate: '/plans/create',
+    planEdit: '/plans/:id/edit',
+    // sections
+    sectionIndex: '/sections',
+    sectionCreate: '/sections/create',
+    sectionEdit: '/sections/:id/edit',
+    // sliders
+    sliderIndex: '/sliders',
+    sliderCreate: '/sliders/create',
+    sliderEdit: '/sliders/:id/edit',
+    // gateways
+    gatewayIndex: '/gateways',
+    gatewayCreate: '/gateways/create',
+    gatewayEdit: '/gateways/:id/edit',
+    // areas
+    provinceIndex: '/provinces',
+    provinceCreate: '/provinces/create',
+    provinceEdit: '/provinces/:id/edit',
+    cityIndex: '/cities',
+    cityCreate: '/cities/create',
+    cityEdit: '/cities/:id/edit',
     // users
     userIndex: '/users',
     userCreate: '/users/create',

@@ -1,12 +1,12 @@
 // import store from '../store';
-import Authentication from './Authentication';
 
 export class Permission {
+    // static check(requiredPermissions: string[]): boolean {
     static check(requiredPermissions: string[]): boolean {
         return true;
         // If "any" is in the required permissions, return true immediately
-        const role = Authentication.getRole();
-        if (requiredPermissions.includes('any') || (role && requiredPermissions.includes(role))) {
+        // const role = Authentication.getRole();
+        if (requiredPermissions.includes('any') || (requiredPermissions.includes('test'))) {
             return true;
         }
         return false;

@@ -6,8 +6,6 @@ import Input from '../../../components/form/input/InputField';
 import Checkbox from '../../../components/form/input/Checkbox';
 import Button from '../../../components/ui/button/Button';
 import Authentication from '../../../classes/Authentication';
-import { Permission } from '../../../classes/Permission';
-import { ROUTES } from '../../../routes';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -40,9 +38,9 @@ export default function LoginForm() {
       localStorage.removeItem('rememberedPassword');
     }
     
-    if (Permission.check(['user'])) {
-      navigate(ROUTES.userHome)
-    }
+    // if (Permission.check(['user'])) {
+    //   navigate(ROUTES.userHome)
+    // }
     navigate('/');
   };
 

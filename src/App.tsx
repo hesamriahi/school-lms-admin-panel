@@ -32,6 +32,28 @@ import ContradictionsIndex from './pages/Contradictions/ContradictionsIndex.tsx'
 import UserInstallmentsIndex from './pages/Loans/User/UserInstallmentsIndex';
 import UserLoansIndex from './pages/Loans/User/UserLoansIndex';
 import UserRequestedLoansIndex from './pages/Loans/User/UserRequestedLoansIndex';
+import TeacherIndex from './pages/Teachers/TeacherIndex';
+import TeacherCreateEdit from './pages/Teachers/TeacherCreateEdit';
+import StudentCommentIndex from './pages/StudentComments/StudentCommentIndex';
+import StudentCommentCreateEdit from './pages/StudentComments/StudentCommentCreateEdit';
+import CategoryIndex from './pages/Categories/CategoryIndex';
+import CategoryCreateEdit from './pages/Categories/CategoryCreateEdit';
+import CourseIndex from './pages/Courses/CourseIndex';
+import CourseCreateEdit from './pages/Courses/CourseCreateEdit';
+import UnitIndex from './pages/Courses/UnitIndex';
+import UnitCreateEdit from './pages/Courses/UnitCreateEdit';
+import PlanIndex from './pages/Plans/PlanIndex';
+import PlanCreateEdit from './pages/Plans/PlanCreateEdit';
+import SectionIndex from './pages/Sections/SectionIndex';
+import SectionCreateEdit from './pages/Sections/SectionCreateEdit';
+import SliderIndex from './pages/Sliders/SliderIndex';
+import SliderCreateEdit from './pages/Sliders/SliderCreateEdit';
+import GatewayIndex from './pages/Gateways/GatewayIndex';
+import GatewayCreateEdit from './pages/Gateways/GatewayCreateEdit';
+import ProvinceIndex from './pages/Areas/ProvinceIndex';
+import ProvinceCreateEdit from './pages/Areas/ProvinceCreateEdit';
+import CityIndex from './pages/Areas/CityIndex';
+import CityCreateEdit from './pages/Areas/CityCreateEdit';
 
 
 
@@ -47,6 +69,48 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
             <Route index path={ROUTES.home} element={<Home />} />
+            {/* Teachers */}
+            <Route path={ROUTES.teacherIndex} element={<TeacherIndex />} />
+            <Route path={ROUTES.teacherCreate} element={<TeacherCreateEdit />} />
+            <Route path={ROUTES.teacherEdit} element={<TeacherCreateEdit />} />
+            {/* Student Comments */}
+            <Route path={ROUTES.studentCommentIndex} element={<StudentCommentIndex />} />
+            <Route path={ROUTES.studentCommentCreate} element={<StudentCommentCreateEdit />} />
+            <Route path={ROUTES.studentCommentEdit} element={<StudentCommentCreateEdit />} />
+            {/* Categories */}
+            <Route path={ROUTES.categoryIndex} element={<CategoryIndex />} />
+            <Route path={ROUTES.categoryCreate} element={<CategoryCreateEdit />} />
+            <Route path={ROUTES.categoryEdit} element={<CategoryCreateEdit />} />
+            {/* Courses + Units */}
+            <Route path={ROUTES.courseCreate} element={<CourseCreateEdit />} />
+            <Route path={ROUTES.courseUnitCreate} element={<UnitCreateEdit />} />
+            <Route path={ROUTES.courseUnitEdit} element={<UnitCreateEdit />} />
+            <Route path={ROUTES.courseUnitsIndex} element={<UnitIndex />} />
+            <Route path={ROUTES.courseEdit} element={<CourseCreateEdit />} />
+            <Route path={ROUTES.courseIndex} element={<CourseIndex />} />
+            {/* Plans */}
+            <Route path={ROUTES.planIndex} element={<PlanIndex />} />
+            <Route path={ROUTES.planCreate} element={<PlanCreateEdit />} />
+            <Route path={ROUTES.planEdit} element={<PlanCreateEdit />} />
+            {/* Sections */}
+            <Route path={ROUTES.sectionIndex} element={<SectionIndex />} />
+            <Route path={ROUTES.sectionCreate} element={<SectionCreateEdit />} />
+            <Route path={ROUTES.sectionEdit} element={<SectionCreateEdit />} />
+            {/* Sliders */}
+            <Route path={ROUTES.sliderIndex} element={<SliderIndex />} />
+            <Route path={ROUTES.sliderCreate} element={<SliderCreateEdit />} />
+            <Route path={ROUTES.sliderEdit} element={<SliderCreateEdit />} />
+            {/* Gateways */}
+            <Route path={ROUTES.gatewayIndex} element={<GatewayIndex />} />
+            <Route path={ROUTES.gatewayCreate} element={<GatewayCreateEdit />} />
+            <Route path={ROUTES.gatewayEdit} element={<GatewayCreateEdit />} />
+            {/* Areas */}
+            <Route path={ROUTES.provinceIndex} element={<ProvinceIndex />} />
+            <Route path={ROUTES.provinceCreate} element={<ProvinceCreateEdit />} />
+            <Route path={ROUTES.provinceEdit} element={<ProvinceCreateEdit />} />
+            <Route path={ROUTES.cityIndex} element={<CityIndex />} />
+            <Route path={ROUTES.cityCreate} element={<CityCreateEdit />} />
+            <Route path={ROUTES.cityEdit} element={<CityCreateEdit />} />
             {/* Users */}
             <Route path={ROUTES.userIndex} element={<UserIndex />} />
             <Route path={ROUTES.userCreate} element={<UserCreateEdit />} />
