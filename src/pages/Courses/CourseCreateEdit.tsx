@@ -6,6 +6,7 @@ import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import TextArea from "../../components/form/input/TextArea";
 import FileInput from "../../components/form/input/FileInput";
+import UploaderField from "../../components/form/input/UploaderField";
 import Switch from "../../components/form/switch/Switch";
 import Checkbox from "../../components/form/input/Checkbox";
 import Button from "../../components/ui/button/Button";
@@ -44,9 +45,12 @@ export default function CourseCreateEdit() {
     slug: "",
     category_ids: [] as number[],
     main_image: null as MediaDisplay | null,
+    video: null as MediaDisplay | null,
     images: [] as MediaDisplay[],
   });
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+  const [videoUuid, setVideoUuid] = useState<string | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [fileUploads, setFileUploads] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +79,7 @@ export default function CourseCreateEdit() {
           slug: data.slug ?? "",
           category_ids: (data.categories || []).map((item: any) => item.id),
           main_image: data.main_image ?? null,
+          video: data.video ?? null,
           images: data.images ?? [],
         });
         setIsLoaded(true);
@@ -100,8 +105,8 @@ export default function CourseCreateEdit() {
       ToastrNotification.error("استاد را انتخاب کنید");
       return;
     }
-    if (!isUpdateMode && !mainImageFile) {
-      ToastrNotification.error("تصویر اصلی دوره الزامی است");
+    if (!isUpdateMode && !videoUuid) {
+      ToastrNotification.error("ویدئوی دوره الزامی است");
       return;
     }
     setIsSubmitting(true);
@@ -126,6 +131,7 @@ export default function CourseCreateEdit() {
       };
       if (hasFiles) payload["category_ids[]"] = form.category_ids;
       else payload.category_ids = form.category_ids;
+      if (videoUuid) payload.uuid = videoUuid;
       if (mainImageFile) payload.main_image = mainImageFile;
       if (galleryFiles.length) payload[hasFiles ? "images[]" : "images"] = galleryFiles;
       if (fileUploads.length) payload[hasFiles ? "files[]" : "files"] = fileUploads;
@@ -148,6 +154,11 @@ export default function CourseCreateEdit() {
   const currentImageUrl = useMemo(
     () => (mainImageFile ? URL.createObjectURL(mainImageFile) : mediaUrl(form.main_image)),
     [mainImageFile, form.main_image]
+  );
+
+  const currentVideoUrl = useMemo(
+    () => videoPreviewUrl || form.video?.url || "",
+    [videoPreviewUrl, form.video]
   );
 
   return (
@@ -217,7 +228,7 @@ export default function CourseCreateEdit() {
             <Input type="number" step={0.1} value={form.rate} onChange={(e) => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} />
           </div>
           <div>
-            <Label>اسلاگ</Label>
+            <Label>اسل321اگ</Label>
             <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           </div>
           <div className="md:col-span-2">
@@ -239,6 +250,34 @@ export default function CourseCreateEdit() {
                 <Checkbox key={item.id} label={item.title} checked={form.category_ids.includes(item.id)} onChange={() => toggleCategory(item.id)} />
               ))}
             </div>
+          </div>
+          <div className="md:col-span-2">
+            <Label>{isUpdateMode ? "ویدئوی دوره (اختیاری)" : "ویدئوی دوره"}</Label>
+            <h1>{currentVideoUrl}</h1>
+            {currentVideoUrl && (
+              <video src={currentVideoUrl} className="mb-3 max-h-40 w-full max-w-md rounded-lg bg-black object-contain" controls />
+            )}
+            <UploaderField
+              name="file"
+              multiple={false}
+              accept={["video/mp4", "video/mpeg", "video/webm", "video/quicktime"]}
+              placeholder="ویدئو را انتخاب یا اینجا رها کنید"
+              onSuccess={(uuid, file) => {
+                setVideoUuid(uuid);
+                setVideoPreviewUrl((prev) => {
+                  if (prev) URL.revokeObjectURL(prev);
+                  return URL.createObjectURL(file);
+                });
+              }}
+              onRemove={() => {
+                setVideoUuid(null);
+                setVideoPreviewUrl((prev) => {
+                  if (prev) URL.revokeObjectURL(prev);
+                  return null;
+                });
+              }}
+              onError={(error) => ToastrNotification.error(error.message || "خطا در آپلود ویدئو")}
+            />
           </div>
           <div>
             <Label>{isUpdateMode ? "تصویر اصلی (اختیاری)" : "تصویر اصلی"}</Label>
