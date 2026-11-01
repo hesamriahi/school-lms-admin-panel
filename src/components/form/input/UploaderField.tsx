@@ -158,6 +158,8 @@ const UploaderField: FC<UploaderFieldProps> = ({
       endpoint,
       chunkSize: CHUNK_SIZE,
       retryDelays: [0, 1000, 3000, 5000],
+      // By using this, we prevent files from being cached. This way, every time a user uploads a file, the server receives it.
+      removeFingerprintOnSuccess: true, 
       headers: needAuthentication
         ? () => {
             const token = Authentication.getAccessToken();

@@ -11,12 +11,12 @@ import Switch from "../../components/form/switch/Switch";
 import Checkbox from "../../components/form/input/Checkbox";
 import Button from "../../components/ui/button/Button";
 import SearchableDropDownList from "../../components/common/SearchableDropDownList";
-import ApiRequest from "../../classes/ApiRequest";
+import ApiRequest, { ApiResponse } from "../../classes/ApiRequest";
 import ToastrNotification from "../../classes/ToastrNotification";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../../routes";
 import { Permission } from "../../classes/Permission.ts";
-import { MediaDisplay, mediaUrl, rowsFrom, selectClassName, submitAdminResource } from "../../utils/adminForm";
+import { MediaDisplay, rowsFrom, selectClassName } from "../../utils/adminForm";
 
 export default function CourseCreateEdit() {
   if (Permission.check(["super_admin"]) === false) return <Navigate to={ROUTES.home} replace />;
@@ -54,12 +54,15 @@ export default function CourseCreateEdit() {
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [fileUploads, setFileUploads] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasDiscount, setHasDiscount] = useState(false);
 
   useEffect(() => {
     ApiRequest.call("api/admin/categories", "GET").then((response) => setCategories(rowsFrom(response, "categories")));
     if (isUpdateMode) {
       ApiRequest.call("api/admin/courses/" + id, "GET").then((response) => {
         const data = response.data.course;
+        const discountHasValue = data.discount !== null && data.discount !== undefined && data.discount !== "";
+        setHasDiscount(discountHasValue);
         setForm({
           title: data.title ?? "",
           en_title: data.en_title ?? "",
@@ -71,7 +74,7 @@ export default function CourseCreateEdit() {
           meta_title: data.meta_title ?? "",
           meta_description: data.meta_description ?? "",
           unit_price: data.unit_price ?? 0,
-          discount: data.discount ?? 0,
+          discount: discountHasValue ? data.discount : 0,
           discount_type: data.discount_type ?? "flat",
           capacity: data.capacity ?? 0,
           rate: Number(data.rate ?? 0),
@@ -122,8 +125,8 @@ export default function CourseCreateEdit() {
         meta_title: form.meta_title,
         meta_description: form.meta_description,
         unit_price: form.unit_price,
-        discount: form.discount,
-        discount_type: form.discount_type,
+        discount: hasDiscount ? form.discount : null,
+        discount_type: hasDiscount ? form.discount_type : null,
         capacity: form.capacity,
         rate: form.rate,
         is_active: form.is_active ? 1 : 0,
@@ -131,15 +134,19 @@ export default function CourseCreateEdit() {
       };
       if (hasFiles) payload["category_ids[]"] = form.category_ids;
       else payload.category_ids = form.category_ids;
-      if (videoUuid) payload.uuid = videoUuid;
+      if (videoUuid) payload.video_uuid = videoUuid;
       if (mainImageFile) payload.main_image = mainImageFile;
       if (galleryFiles.length) payload[hasFiles ? "images[]" : "images"] = galleryFiles;
       if (fileUploads.length) payload[hasFiles ? "files[]" : "files"] = fileUploads;
+      if (isUpdateMode && hasFiles) payload._method = "PUT";
 
-      const response = await submitAdminResource(
+      const response: ApiResponse = await ApiRequest.call(
         isUpdateMode ? "api/admin/courses/" + id : "api/admin/courses",
-        isUpdateMode,
+        isUpdateMode && !hasFiles ? "PUT" : "POST",
         payload,
+        null,
+        true,
+        true,
         hasFiles
       );
       if (response.success) navigate(ROUTES.courseIndex);
@@ -152,8 +159,8 @@ export default function CourseCreateEdit() {
   };
 
   const currentImageUrl = useMemo(
-    () => (mainImageFile ? URL.createObjectURL(mainImageFile) : mediaUrl(form.main_image)),
-    [mainImageFile, form.main_image]
+    () => (mainImageFile ? URL.createObjectURL(mainImageFile) : form.main_image?.url),
+    [mainImageFile, form.main_image?.url]
   );
 
   const currentVideoUrl = useMemo(
@@ -208,17 +215,34 @@ export default function CourseCreateEdit() {
             <Label>قیمت</Label>
             <Input type="text" numberFormat value={form.unit_price} onChange={(e) => setForm({ ...form, unit_price: parseInt(e.target.value) || 0 })} />
           </div>
-          <div>
-            <Label>تخفیف</Label>
-            <Input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: parseInt(e.target.value) || 0 })} />
+          <div className="md:col-span-2">
+            <div className="md:w-1/2 md:pl-3">
+              <Label>تخفیف</Label>
+              <select
+                className={selectClassName}
+                value={hasDiscount ? "1" : "0"}
+                onChange={(e) => setHasDiscount(e.target.value === "1")}
+              >
+                <option value="0">ندارد</option>
+                <option value="1">دارد</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <Label>نوع تخفیف</Label>
-            <select className={selectClassName} value={form.discount_type} onChange={(e) => setForm({ ...form, discount_type: e.target.value })}>
-              <option value="flat">مبلغی</option>
-              <option value="percentage">درصدی</option>
-            </select>
-          </div>
+          {hasDiscount && (
+            <>
+              <div>
+                <Label>نوع تخفیف</Label>
+                <select className={selectClassName} value={form.discount_type} onChange={(e) => setForm({ ...form, discount_type: e.target.value })}>
+                  <option value="flat">مبلغی</option>
+                  <option value="percentage">درصدی</option>
+                </select>
+              </div>
+              <div>
+                <Label>مقدار تخفیف</Label>
+                <Input type="number" value={form.discount} onChange={(e) => setForm({ ...form, discount: parseInt(e.target.value) || 0 })} />
+              </div>
+            </>
+          )}
           <div>
             <Label>ظرفیت</Label>
             <Input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) || 0 })} />
@@ -228,7 +252,7 @@ export default function CourseCreateEdit() {
             <Input type="number" step={0.1} value={form.rate} onChange={(e) => setForm({ ...form, rate: parseFloat(e.target.value) || 0 })} />
           </div>
           <div>
-            <Label>اسل321اگ</Label>
+            <Label>اسلاگ</Label>
             <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           </div>
           <div className="md:col-span-2">
@@ -252,8 +276,8 @@ export default function CourseCreateEdit() {
             </div>
           </div>
           <div className="md:col-span-2">
+            <h1>{videoUuid}</h1>
             <Label>{isUpdateMode ? "ویدئوی دوره (اختیاری)" : "ویدئوی دوره"}</Label>
-            <h1>{currentVideoUrl}</h1>
             {currentVideoUrl && (
               <video src={currentVideoUrl} className="mb-3 max-h-40 w-full max-w-md rounded-lg bg-black object-contain" controls />
             )}
@@ -289,7 +313,7 @@ export default function CourseCreateEdit() {
             {form.images.length > 0 && (
               <div className="mb-3 flex flex-wrap gap-2">
                 {form.images.map((img, index) => (
-                  <img key={img.id ?? index} src={mediaUrl(img)} alt="" className="h-16 w-16 rounded-lg object-cover" />
+                  <img key={img.id ?? index} src={img.url} alt="" className="h-20 w-20 rounded-lg object-cover" />
                 ))}
               </div>
             )}
